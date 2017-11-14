@@ -88,5 +88,11 @@ result of (Accuracy : 0.993,95% CI : (0.9906, 0.995)) as compared to Decision tr
 (Accuracy : 0.7329,95% CI : (0.7214, 0.7442)),so one should definitely select randomForest
 model.When we applied to the validation set for cross validation, the model achieved an accuracy of 99.3%, which indicates the expected out-of-sample error is estimated at 0.007.
 
+```{r echo=TRUE}
+#Final Result:I have choosen randomForest model for the 20 given test set for the predictions
+  
+PredictionModel<- predict(RandomForest,TestData,type="class")
+PredictionModel
+```
 
 
