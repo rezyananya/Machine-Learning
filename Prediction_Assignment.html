@@ -600,6 +600,13 @@ confusionMatrix(RandomForestModelTwo,SubTestingData$classe)</code></pre>
 <div id="conclusion" class="section level1">
 <h1>Conclusion:</h1>
 <p>If I compare two of my models, it’s clearly visible that randomForest giving me result of (Accuracy : 0.993,95% CI : (0.9906, 0.995)) as compared to Decision tree (Accuracy : 0.7329,95% CI : (0.7214, 0.7442)),so one should definitely select randomForest model.When we applied to the validation set for cross validation, the model achieved an accuracy of 99.3%, which indicates the expected out-of-sample error is estimated at 0.007.</p>
+<pre class="r"><code>#Final Result:I have choosen randomForest model for the 20 given test set for the predictions
+  
+PredictionModel&lt;- predict(RandomForest,TestData,type=&quot;class&quot;)
+PredictionModel</code></pre>
+<pre><code>##  1  2  3  4  5  6  7  8  9 10 11 12 13 14 15 16 17 18 19 20 
+##  B  A  B  A  A  E  D  B  A  A  B  C  B  A  E  E  A  B  B  B 
+## Levels: A B C D E</code></pre>
 </div>
 
 
