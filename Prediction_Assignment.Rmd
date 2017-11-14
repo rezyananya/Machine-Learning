@@ -1,0 +1,92 @@
+---
+title: "Prediction_Assignment"
+author: "Rezyananya"
+date: "14 November 2017"
+output:
+  html_document: default
+---
+#Overview:
+Using devices such as Jawbone Up, Nike FuelBand, and Fitbit it is now possible to collect a large amount of data about personal activity relatively inexpensively. These type of devices are part of the quantified self movement - a group of enthusiasts who take measurements about themselves regularly to improve their health, to find patterns in their behavior, or because they are tech geeks. One thing that people regularly do is quantify how much of a particular activity they do, but they rarely quantify how well they do it. In this project, your goal will be to use data from accelerometers on the belt, forearm, arm, and dumbell of 6 participants.They were asked to perform barbell lifts correctly and incorrectly in 5 different ways.More information is available from the website here:(http://web.archive.org/web/20161224072740/http:/groupware.les.inf.puc-rio.br/har)
+Data
+The training data for this project are available here:
+(https://d396qusza40orc.cloudfront.net/predmachlearn/pml-training.csv)
+The test data are available here:
+(https://d396qusza40orc.cloudfront.net/predmachlearn/pml-testing.csv)
+
+
+```{r echo=TRUE}
+library(caret)
+set.seed(5689)
+# I am reading the training data set and replacing all missing values with "NA"
+TrainingData <- read.csv(file = "C:/Users/Priyanka/Documents/Machine_Learning/pml-training.csv",header = T,sep = ",", na.strings=c("NA","#DIV/0!", ""))
+
+# I am reading the test data set 
+TestData <- read.csv(file = 'C:/Users/Priyanka/Documents/Machine_Learning/pml-testing.csv',header = T,sep = ",", na.strings=c("NA","#DIV/0!", ""))
+
+dim(TrainingData)
+dim(TestData)
+```
+
+```{r echo=TRUE}
+# I am deleting columns having all missing values in it.
+TrainingData<-TrainingData[,colSums(is.na(TrainingData)) == 0]
+TestData <-TestData[,colSums(is.na(TestData)) == 0]
+
+# I am deleting variables that are not much in use and we should delete these variables are:
+#user_name, raw_timestamp_part_1, raw_timestamp_part_,2 cvtd_timestamp, new_window, and  
+#num_window (columns 1 to 7).
+
+TrainingData <-TrainingData[,-c(1:7)]
+TestData <-TestData[,-c(1:7)]
+
+head(TrainingData)
+head(TestData)
+```
+
+```{r echo=TRUE}
+#Applying cross-validation for training data which is partionned to subtraining (70%) and #subtesting (30%).
+SubTraining <- createDataPartition(y=TrainingData$classe,p=0.70,list = FALSE)
+SubTrainingData <- TrainingData[SubTraining,]
+SubTestingData <- TrainingData[-SubTraining,]
+
+head(SubTrainingData)
+head(SubTestingData)
+```
+#Graph
+```{r echo=TRUE}
+plot(SubTrainingData$classe, col="green", main="levels of the classe of SubTraining data", xlab="classe levels", ylab="Frequency")
+
+#From the graph we can see the frequency of all 5 classe levels of our SubTraining Data.Classe 'A' has the maximum number of occurences while classe 'D' has minimum number of occurences.
+```
+#Model using via Decision Tree:
+```{r echo=TRUE}
+library(rpart)
+library(rpart.plot)
+tree = rpart(classe ~ ., data=SubTrainingData, method = "class")
+
+TreeModelOne <- predict(tree,SubTestingData, type = "class")
+confusionMatrix(TreeModelOne,SubTestingData$classe)
+#Graph
+rpart.plot(tree,main="Tree Structure of classe", extra=100, under=TRUE, faclen=1)
+```
+#Model using via Random Forest:
+```{r echo=TRUE}
+library(randomForest)
+RandomForest = randomForest(classe ~ ., data=SubTrainingData, method = "class")
+RandomForestModelTwo <- predict(RandomForest,SubTestingData, type = "class")
+confusionMatrix(RandomForestModelTwo,SubTestingData$classe)
+```
+
+#Cross-Validation: 
+We have taken SubTrainingData (70% of the original Training data set) 
+and SubTestingData (30%) for performing cross-validation and cross-validation we have
+performed to our training data set randomly without replacing the two subsamples.
+
+#Conclusion: 
+If I compare two of my models, it's clearly visible that randomForest giving me
+result of (Accuracy : 0.993,95% CI : (0.9906, 0.995)) as compared to Decision tree 
+(Accuracy : 0.7329,95% CI : (0.7214, 0.7442)),so one should definitely select randomForest
+model.When we applied to the validation set for cross validation, the model achieved an accuracy of 99.3%, which indicates the expected out-of-sample error is estimated at 0.007.
+
+
+
