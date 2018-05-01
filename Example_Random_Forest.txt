@@ -1,0 +1,139 @@
+Binary Classification – A Comparison of “Titanic” Proportions Between Logistic Regression, Random Forests, and Conditional Trees
+December 23, 2012
+By inkhorn82
+
+inShare
+(This article was first published on Data and Analysis with R, at Work, and kindly contributed to R-bloggers)
+18
+SHARES
+Share
+Tweet
+Now that I’m on my winter break, I’ve been taking a little bit of time to read up on some modelling techniques that I’ve never used before. Two such techniques are Random Forests and Conditional Trees.  Since both can be used for classification, I decided to see how they compare against a simple binomial logistic regression (something I’ve worked with a lot) for binary classification.
+
+The dataset I used contains records of the survival of Titanic Passengers and such information as sex, age, fare each person paid, number of parents/children aboard, number of siblings or spouses aboard, passenger class and other fields (The titanic dataset can be retrieved from a page on Vanderbilt’s website replete with lots of datasets; look for “titanic3?).
+
+I took one part of the dataset to train my models, and another part to test them.  The factors that I focused on were passenger class, sex, age, and number of siblings/spouses aboard.
+
+First, let’s look at the GLM:
+
+titanic.survival.train = glm(survived ~ pclass + sex + pclass:sex + age + sibsp,
+family = binomial(logit), data = titanic.train)
+As you can see, I worked in an interaction effect between passenger class and sex, as passenger class showed a much bigger difference in survival rate amongst the women compared to the men (i.e. Higher class women were much more likely to survive than lower class women, whereas first class Men were more likely to survive than 2nd or 3rd class men, but not by the same margin as amongst the women).  Following is the model summary output, if you’re interested:
+
+> summary(titantic.survival.train)
+
+Call:
+glm(formula = survived ~ pclass + sex + pclass:sex + age + sibsp, 
+    family = binomial(logit), data = titanic.train)
+
+Deviance Residuals: 
+    Min       1Q   Median       3Q      Max  
+-2.9342  -0.6851  -0.5481   0.5633   2.3164  
+
+Coefficients:
+                Estimate Std. Error z value Pr(>|z|)    
+(Intercept)     6.556807   0.878331   7.465 8.33e-14 ***
+pclass         -1.928538   0.278324  -6.929 4.24e-12 ***
+sexmale        -4.905710   0.785142  -6.248 4.15e-10 ***
+age            -0.036462   0.009627  -3.787 0.000152 ***
+sibsp          -0.264190   0.106684  -2.476 0.013272 *  
+pclass:sexmale  1.124111   0.299638   3.752 0.000176 ***
+---
+Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1 
+
+(Dispersion parameter for binomial family taken to be 1)
+
+    Null deviance: 858.22  on 649  degrees of freedom
+Residual deviance: 618.29  on 644  degrees of freedom
+AIC: 630.29
+
+Number of Fisher Scoring iterations: 5
+So, after I used my model to predict survival probabilities on the testing portion of the dataset, I checked to see how many records showed a probability of over .5 (or 50%), and then how many of those records were actual survivors.  For the GLM, 146/164 (89%) of those records scored at 50% or higher were actual survivors.  Not bad!
+
+Now let’s move on to Random Forests:
+
+> titanic.survival.train.rf = randomForest(as.factor(survived) ~ pclass + sex + age + sibsp, data=titanic.train,ntree=5000, importance=TRUE)
+
+> titanic.survival.train.rf
+
+Call:
+ randomForest(formula = as.factor(survived) ~ pclass + sex + age +      sibsp, data = titanic.train, ntree = 5000, importance = TRUE) 
+               Type of random forest: classification
+                     Number of trees: 5000
+No. of variables tried at each split: 2
+
+        OOB estimate of  error rate: 22.62%
+Confusion matrix:
+    0   1 class.error
+0 370  38  0.09313725
+1 109 133  0.45041322
+
+> importance(titanic.survival.train.rf)
+               0          1 MeanDecreaseAccuracy MeanDecreaseGini
+pclass  67.26795 125.166721            126.40379         34.69266
+sex    160.52060 221.803515            224.89038         62.82490
+age     70.35831  50.568619             92.67281         53.41834
+sibsp   60.84056   3.343251             52.82503         14.01936
+It seems to me that the output indicates that the Random Forests model is better at creating true negatives than true positives, with regards to survival of the passengers, but when I asked for the predicted survival categories in the testing portion of my dataset, it appeared to do a pretty decent job predicting who would survive and who wouldn’t:
+
+For the Random Forests model, 155/184 (84%) of those records predicted to survive actually did survive!  Again, not bad.
+
+Finally, lets move on to the Conditional Tree model:
+
+> titanic.survival.train.ctree = ctree(as.factor(survived) ~ pclass + sex + age + sibsp, data=titanic.train)
+
+> titanic.survival.train.ctree
+
+	 Conditional inference tree with 7 terminal nodes
+
+Response:  as.factor(survived) 
+Inputs:  pclass, sex, age, sibsp 
+Number of observations:  650 
+
+1) sex == {female}; criterion = 1, statistic = 141.436
+  2) pclass <= 2; criterion = 1, statistic = 55.831
+    3) pclass <= 1; criterion = 0.988, statistic = 8.817       
+     4)*  weights = 74      3) pclass > 1
+      5)*  weights = 47 
+  2) pclass > 2
+    6)*  weights = 105 
+1) sex == {male}
+  7) pclass <= 1; criterion = 1, statistic = 15.095     
+   8)*  weights = 88    
+  7) pclass > 1
+    9) age <= 12; criterion = 1, statistic = 14.851
+      10) sibsp <= 1; criterion = 0.998, statistic = 12.062               11)*  weights = 18        
+      10) sibsp > 1
+       12)*  weights = 12 
+    9) age > 12
+      13)*  weights = 306
+Titanic Conditional Tree
+
+I really happen to like the graph output by plotting the conditional tree model.  I find it pretty easy to understand.  As you can see, the model started the split of the data according to sex, which it found to be most significant, then pclass, age, and then siblings/spouses.  That being said, let’s look at how the prediction went for comparison purposes:
+
+134/142 (94%) of records predicted to survive actually did survive!  Great!!  Now let’s bring all those prediction stats into one table for a final look:
+
+                     glm randomForests ctree
+Actually Survived    146           155   134
+Predicted to Survive 164           184   142
+% Survived           89%           84%   94%
+So, in terms of finding the highest raw number of folks who actually did survive, the Random Forests model won, but in terms of having the highest true positive rate, the Conditional Tree model takes the cake!  Neat exercise!
+
+Notes:
+
+(1) There were numerous records without an age value.  I estimated ages using a regression model taken from those who did have ages.  Following are the coefficients for that model:
+
+44.59238 + (-5.98582*pclass) + (.15971*fare) + (-.14141*pclass:fare)
+
+(2) Although I used GLM scores of over .5 to classify records as survived, I could have played with that to get different results.  I really just wanted to have some fun, and not try all possibilities here:)
+
+(3) I hope you enjoyed this post!  If you have anything to teach me about Random Forests or Conditional Trees, please leave a comment and be nice (I’m trying to expand my analysis skills here!!).
+
+EDIT:
+I realized that I should also post the false negative rate for each model, because it’s important to know how many people each model missed coding as survived. So, here are the stats:
+
+                           glm    rf ctree   gbm
+Actually Survived          112   103   124    74
+Predicted Not to Survive   495   475   517   429
+False Negative Rate      22.6% 21.7%   24% 17.2%
+As you can see, the gbm model shows the lowest false negative rate, which is pretty nice! Compare that against the finding that it correctly predicted the survival of 184/230 (80%) records that were scored with a probability of 50% or higher, and that makes a pretty decent model.
