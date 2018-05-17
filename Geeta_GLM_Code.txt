@@ -1,0 +1,69 @@
+
+
+# Libraries 
+library(glm2)
+library("readxl")
+library(dplyr)
+
+#-------------------------------------------------------------------------------------------
+# Loading the data and observing
+my_data_titanicC1 <- read_excel("D:/GD_Personal/R-PROGRAMMING/TGA/titanic/titanic3C1.xlsx")
+
+str(my_data_titanicC1)
+summary(my_data_titanicC1)
+
+
+#-------------------------------------------------------------------------------------------
+# Cleaning and Preparing Data.  Part of cleaning is done in the Excel
+# Data Preparation in Excel includes
+#     1.  Taking only required fields
+#     2.  Replacing Null Values in Age by median of the rest of the data
+#     3.  Removed name, ticket, cabin, embarked, boat, body, home.dest
+#     4.  Relaced missing values in fare with median of the rest of data
+
+data_facC1= my_data_titanicC1 %>% mutate_if(is.character, as.factor)
+data_facC1$survived <- factor(data_facC1$survived)
+data_facC1$pclass <- factor(data_facC1$pclass)
+as.numeric(as.character(data_fac))
+
+#-------------------------------------------------------------------------------
+# GLM - Creating GLM Model - Survived Vs (sex+pclass+age+sibsp+parch+fare)
+fitglm <- glm(formula = as.formula(survived ~ sex+pclass+age+sibsp+parch+fare) , 
+              data =data_facC1, family = "binomial" )
+summary(fitglm)
+
+# ------------------------------------------------------------------------------
+# Prediction
+# this excel contains same data without column 'survived' as it is being predicted
+p1 <- read_excel("D:/GD_Personal/R-PROGRAMMING/TGA/titanic/titanic3C2.xlsx")
+
+data_facC2= p1 %>% mutate_if(is.character, as.factor)
+data_facC2$pclass <- factor(data_facC2$pclass)
+str(data_facC2)
+
+# Considering only first row for testing
+data_facC3 <- data_facC2[1,]
+
+# Considering first row and checking the prediction
+data_facC3
+str(data_facC3)
+
+prglm <- predict(fitglm,newdata = data_facC3)
+prglm
+#------------------------------------------------------------------------------
+
+# Linear Model - Survived Vs Age
+str(data_facC1)
+y <- my_data_titanicC1$survived
+x <- my_data_titanicC1$age
+fitlm <- lm(y ~ x, data = my_data_titanicC1)
+summary(fitlm)
+
+data_facC4 <- my_data_titanicC1$age
+str(data_facC4)
+
+prlm <- predict(fitlm,ndata = data_facC4)
+prlm
+#-----------------------------------------------------------------------------
+titanic_assignment_glm.txt
+Displaying titanic_assignment_glm.txt.
