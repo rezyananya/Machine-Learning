@@ -1,0 +1,34 @@
+#Discriminant analysis on iris data set:
+
+library(tidyverse)
+library(MASS)
+library(klaR)
+set.seed(101)
+sample_n(iris, 10)
+
+#Preparing the data:
+training_sample <- sample(c(TRUE, FALSE), nrow(iris), replace = T, prob = c(0.6,0.4))
+train <- iris[training_sample, ]
+test <- iris[!training_sample, ]
+
+#Applying LDA:
+lda.iris <- lda(Species ~ ., train)
+lda.iris 
+
+#Plotting to see that how the observations are grouped together.
+plot(lda.iris, col = as.integer(train$Species))
+
+plot(lda.iris, dimen = 1, type = "b")
+
+#LDA partition plot
+partimat(Species ~ Sepal.Length + Sepal.Width + Petal.Length + Petal.Width, data=train, method="lda")
+
+#LDA Prediction:
+lda.train <- predict(lda.iris)
+train$lda <- lda.train$class
+table(train$lda,train$Species)
+
+#Now let’s run our test set against this model to determine its accuracy.
+lda.test <- predict(lda.iris,test)
+test$lda <- lda.test$class
+table(test$lda,test$Species)
