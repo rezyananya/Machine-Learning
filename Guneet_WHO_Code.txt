@@ -1,0 +1,50 @@
+#Reading data
+who <- read.csv("H:/WHOSIS_000004.csv")
+library(WHO)
+library(dplyr)
+library(ggplot2)
+
+
+str(who)
+qplot(Year,Both.sexes,data = who)
+qplot(Year,Both.sexes,data = who,col = "drv")
+
+
+#Adding a geom
+qplot(Year,Both.sexes,data = who,geom = c("point","smooth"))
+
+qplot(Both.sexes,data = who,geom = "density",color = "drv") #selected geom as density
+
+#Histogram
+
+qplot(Both.sexes, data = who, fill = "drv")
+qplot(Male, data = who, fill = "drv")
+qplot(Female, data = who, fill = "drv")
+
+
+#Trend
+
+ggplot(who,aes(x=Both.sexes,y=Year))+geom_point()+geom_smooth()
+
+ggplot(who,aes(x=Both.sexes,y=Year))+geom_point()+geom_smooth(se=FALSE)
+
+ggplot(who,aes(x=Both.sexes,y=Year))+geom_point()+geom_smooth(method = "lm")
+
+#Trend considering all the years
+ggplot(data = who, mapping = aes(x = Both.sexes, y = Year, color = Female)) +
+  geom_line()+facet_wrap(~ Country)
+
+#Trend considering specific number of years
+ggplot(subset(who,Year %in% c(2006:2016))) + geom_line(aes(Both.sexes,Year,colour=Female))+facet_wrap(~ Country)
+
+#Some other options (geom_point)
+
+ggplot(subset(who,Year %in% c(2001:2016),aes(x=Both.sexes,y=Year))+geom_point()+geom_smooth(method = "lm"))
+
+
+ggplot(subset(who,Year %in% c(2006:2016))) + geom_point(aes(Both.sexes,Year,group=Year, colour=Year))
+
+
+
+
+
