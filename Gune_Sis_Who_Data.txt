@@ -39,4 +39,9 @@ library(ggplot2)
 qplot(Year,Both.sexes,data = who,facets = .~Country)+geom_smooth(method = "lm") + labs(title = "who Data")+
   labs(x = "Year", y = "Both.Sexes") #added labels to the graph
  
+ggplot(data = who, mapping = aes(x = Both.sexes, y = Year, color = Female)) +
+  geom_line()
+
+ggplot(data = who, mapping = aes(x = Both.sexes, y = Year, color = Female)) +
+  geom_line()+facet_wrap(~ Country)
 
