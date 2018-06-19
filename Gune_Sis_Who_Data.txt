@@ -1,0 +1,42 @@
+#Reading data
+who <- read.csv("C:/Users/Priyanka/Documents/Data/WHOSIS_000004.csv")
+library(WHO)
+library(dplyr)
+library(ggplot2)
+
+#who <- get_data("WHOSIS_000004")
+#str(who)
+#who$year <- as.numeric(who$year)
+#ggplot(who, aes(x=Year, y=Both.sexes, color=Country))+
+  #xlim(2006,20016) +
+  #geom_line(size=1)
+
+library(ggplot2)
+str(who)
+qplot(Year,Both.sexes,data = who)
+qplot(Year,Both.sexes,data = who,col = "drv")
+
+http://www.datacarpentry.org/R-ecology-lesson/04-visualization-ggplot2.html
+
+
+#Adding a geom
+qplot(Year,Both.sexes,data = who,geom = c("point","smooth"))
+
+qplot(Both.sexes,data = who,geom = "density",color = "drv") #selected geom as density
+
+#Histogram
+qplot(Both.sexes, data = who, fill = "drv")
+
+#Facets
+qplot(Year,Both.sexes,data = who,facets = .~ drv)
+
+qplot(Both.sexes,data = who,facets =drv~.) #facets showing histogram display
+
+qplot(displ,hwy,data = mpg,facets = .~drv)+geom_smooth(method = "lm")
+
+
+library(ggplot2)
+qplot(Year,Both.sexes,data = who,facets = .~Country)+geom_smooth(method = "lm") + labs(title = "who Data")+
+  labs(x = "Year", y = "Both.Sexes") #added labels to the graph
+ 
+
