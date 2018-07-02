@@ -185,3 +185,11 @@ shinyServer(function(input, output) {
     model2pred()
   })
 })
+******************************************************************************************************
+
+https://www.linkedin.com/pulse/easy-5-steps-build-your-shiny-app-interact-ml-models-decision-charpy
+http://jadianes.me/sentiment-classifier-shiny
+https://github.com/praneethj13/App_Random_Forest
+https://www.google.com/search?q=random+forest+model+via+shiny+web+app&rlz=1C1OKWM_enUS771US771&oq=random+forest+model+via+shiny+web+app&aqs=chrome..69i57.16895j0j8&sourceid=chrome&ie=UTF-8
+https://github.com/DataScienceSpecialization/courses/blob/master/09_DevelopingDataProducts/slidify/index.Rmd (notes link)
+
