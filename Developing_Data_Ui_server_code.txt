@@ -193,3 +193,15 @@ https://github.com/praneethj13/App_Random_Forest
 https://www.google.com/search?q=random+forest+model+via+shiny+web+app&rlz=1C1OKWM_enUS771US771&oq=random+forest+model+via+shiny+web+app&aqs=chrome..69i57.16895j0j8&sourceid=chrome&ie=UTF-8
 https://github.com/DataScienceSpecialization/courses/blob/master/09_DevelopingDataProducts/slidify/index.Rmd (notes link)
 
+*****************************************************************************************************
+
+AWS link:
+
+https://aws.amazon.com/certification/certified-solutions-architect-associate/ 
+https://aws.amazon.com/faqs/ 
+
+AWS Certified Solutions Architect Official Study Guide (book name)
+https://aws.amazon.com/resource-center/tutorials/ 
+https://aws.amazon.com/resource-center/tutorials/ 
+
+
